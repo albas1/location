@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Find my location</string>
+    <string name="title_activity_maps_activity_loc">Map</string>
+    <string name="history">History</string>
+    <string name="info">info</string>
+    <string name="information">Information</string>
+    <string name="weather">Weather</string>
+</resources>
