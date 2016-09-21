@@ -70,6 +70,7 @@ public class MapsActivityLoc extends FragmentActivity implements OnMapReadyCallb
     protected Location mCurrentLocation;
     protected String mLastUpdateTime;
     TextView info; // Cannot initialize it here, the VIEW has not yet been instantiated.
+    TextView geo;
     public static Button b_history;
     public DatabaseHelper myDb;
 
@@ -82,6 +83,7 @@ public class MapsActivityLoc extends FragmentActivity implements OnMapReadyCallb
 
         // NOW, the UI has been instantiated, we can get a handle to the UI component
         this.info = (TextView) findViewById(R.id.txt_info);
+        geo=(TextView)findViewById(R.id.geo1) ;
 
         updateValuesFromBundle(savedInstanceState);
 
@@ -186,6 +188,7 @@ public class MapsActivityLoc extends FragmentActivity implements OnMapReadyCallb
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        public void onConnected(@Nullable Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             return;
@@ -197,11 +200,10 @@ public class MapsActivityLoc extends FragmentActivity implements OnMapReadyCallb
         }
         if (mLastLocation != null) {
             info.setText("Latitude is"+String.valueOf(mLastLocation.getLatitude())+" "+"Longitude is"+String.valueOf(mLastLocation.getLongitude())+" "+"Altitude is:"+String.valueOf(mLastLocation.getAltitude()));
-            //Insert to SQLite database
-            AddData(mLastLocation.getLatitude(),mLastLocation.getLongitude());
-        }
 
-        startLocationUpdates();
+
+        }
+    }
     }
 
 
@@ -259,12 +261,20 @@ public class MapsActivityLoc extends FragmentActivity implements OnMapReadyCallb
         AppIndex.AppIndexApi.end(mGoogleApiClient, viewAction);
     }
 
-    @Override
+      @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-            info.setText("Latitude is"+String.valueOf(mLastLocation.getLatitude())+" "+"Longitude is"+String.valueOf(mLastLocation.getLongitude())+" "+"Altitude is:"+String.valueOf(mLastLocation.getAltitude()));
-      //Insert to SQLite database
-       AddData(mLastLocation.getLatitude(),mLastLocation.getLongitude()); }
+
+            double latitude=mLastLocation.getLatitude();
+            double longitude=mLastLocation.getLongitude();
+            LatLng p=new LatLng(latitude,longitude);
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(p));
+            info.setText("Latitude is: "+String.valueOf(latitude)+" "+"Longitude is: "+String.valueOf(longitude)+" "+"Altitude is:"+String.valueOf(mLastLocation.getAltitude()));
+            mMap.addMarker(new MarkerOptions().position(p).title("You are here"));
+
+
+
+       }
 
 
 try{
@@ -275,7 +285,7 @@ try{
         }
         else {
             if (addresses.size() > 0) {
-                info.setText("\nYour address is: " +
+                info.setText("Your address is: " +
                         String.valueOf(addresses.get(0).getAdminArea()) +
                         String.valueOf((addresses.get(0).getCountryName()))+
                         String.valueOf(addresses.get(0).getLocality())
@@ -287,7 +297,8 @@ try{
         e.printStackTrace();
     }
 
-        }
+        //Insert to SQLite database
+        AddData(mLastLocation.getLatitude(),mLastLocation.getLongitude()); }
 
     @Override
     protected void onPause() {
@@ -296,13 +307,9 @@ try{
     }
 
     protected void stopLocationUpdates() {
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(
-                    mGoogleApiClient, (LocationListener) this);
-        }
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, (LocationListener) this);
     }
-
-
     @Override
     public void onResume() {
         super.onResume();
@@ -310,6 +317,7 @@ try{
             startLocationUpdates();
         }
     }
+
 public void onClickButtonListener(){
     b_history=(Button)findViewById(R.id.button_his);
     b_history.setOnClickListener(
@@ -329,6 +337,7 @@ public void onClickButtonListener(){
         myDb.InsertData(Latitude,Longitude);
     }
 
+}
 }
 
 
