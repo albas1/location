@@ -7,15 +7,15 @@
     <Button
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:text="@string/history"
+        android:text="@string/go_to_history"
         android:id="@+id/button_his" />
 
     <TextView
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="@string/weather"
-        android:id="@+id/txt_weather"
+        android:text="@string/geocoder"
+        android:id="@+id/geo1"
         android:layout_gravity="right" />
 
     <TextView
