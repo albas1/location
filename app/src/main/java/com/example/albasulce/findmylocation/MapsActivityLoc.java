@@ -69,24 +69,27 @@ public class MapsActivityLoc extends FragmentActivity implements OnMapReadyCallb
     protected final static String KEY_LAST_UPDATED_TIME_STRING = "last-updated-time-string";
     protected Location mCurrentLocation;
     protected String mLastUpdateTime;
-    TextView info= (TextView) findViewById(R.id.txt_info);
+    TextView info; // Cannot initialize it here, the VIEW has not yet been instantiated.
     public static Button b_history;
     public DatabaseHelper myDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // This is where the UI is instantiated
         setContentView(R.layout.activity_maps_activity_loc);
+
+        // NOW, the UI has been instantiated, we can get a handle to the UI component
+        this.info = (TextView) findViewById(R.id.txt_info);
+
+        updateValuesFromBundle(savedInstanceState);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        createLocationRequest();
-        buildLocationSettingsRequest();
-        updateValuesFromBundle(savedInstanceState);
-        startLocationUpdates();
-        onClickButtonListener();
-        myDb=new DatabaseHelper(this);
+        myDb = new DatabaseHelper(this);
 
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
@@ -103,7 +106,10 @@ public class MapsActivityLoc extends FragmentActivity implements OnMapReadyCallb
                     .addApi(AppIndex.API).build();
         }
 
+        createLocationRequest();
+        buildLocationSettingsRequest();
 
+        onClickButtonListener();
     }
 
     protected void buildLocationSettingsRequest() {
@@ -163,6 +169,7 @@ public class MapsActivityLoc extends FragmentActivity implements OnMapReadyCallb
         mMap.setMyLocationEnabled(true);
     }
 
+
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
@@ -175,6 +182,8 @@ public class MapsActivityLoc extends FragmentActivity implements OnMapReadyCallb
         savedInstanceState.putString(KEY_LAST_UPDATED_TIME_STRING, mLastUpdateTime);
         super.onSaveInstanceState(savedInstanceState);
     }
+
+
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -191,7 +200,11 @@ public class MapsActivityLoc extends FragmentActivity implements OnMapReadyCallb
             //Insert to SQLite database
             AddData(mLastLocation.getLatitude(),mLastLocation.getLongitude());
         }
+
+        startLocationUpdates();
     }
+
+
     protected void createLocationRequest() {
         LocationRequest mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(10000);
@@ -283,9 +296,13 @@ try{
     }
 
     protected void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(
-                mGoogleApiClient, (LocationListener) this);
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(
+                    mGoogleApiClient, (LocationListener) this);
+        }
     }
+
+
     @Override
     public void onResume() {
         super.onResume();
