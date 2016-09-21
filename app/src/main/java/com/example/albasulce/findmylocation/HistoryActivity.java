@@ -10,30 +10,17 @@ import android.view.View;
 import android.widget.Button;
 
 public class HistoryActivity extends AppCompatActivity {
-    DatabaseHelper myDb;
-    Cursor res;
-    Button button_history;
+    public TextView tableContent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
-        button_history=(Button)findViewById(R.id.button_his);
-        viewAll();
+
+        tableContent = (TextView) findViewById(R.id.textView1);
+        DatabaseHelper l=new DatabaseHelper(getApplicationContext());
+       tableContent.setText(l.viewAll()+"\n");
 
     }
-    public void viewAll(){
-        button_history.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        StringBuffer buffer=new StringBuffer();
-                        while(res.moveToNext()){
-                            buffer.append("ID:"+res.getString(0)+"\n");
-                            buffer.append("Latitude:"+res.getString(1)+"\n");
-                            buffer.append("Longitude:"+res.getString(2)+"\n");
-                        }
                     }
-                }
-        );
-    }
-   }
+                
