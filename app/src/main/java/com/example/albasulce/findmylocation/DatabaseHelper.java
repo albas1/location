@@ -15,6 +15,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         public static final String Col_3="Longitude";
         public static final String Col_4="Temperature";
         SQLiteDatabase db;
+        Cursor res;
         //Creates the database
         public DatabaseHelper(Context context) {
             super(context, Database_Name, null, 1);
@@ -31,12 +32,27 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         onCreate(db);
         }
 
-        public void InsertData(double Latitude,double Longitude){
-        ContentValues contentValues=new ContentValues();
-        contentValues.put(Col_2,Latitude);
-        contentValues.put(Col_3,Longitude);
+       public void InsertData(double Latitude,double Longitude){
+                SQLiteDatabase db=this.getReadableDatabase();
+                ContentValues contentValues=new ContentValues();
+                contentValues.put(Col_2,Latitude);
+                contentValues.put(Col_3,Longitude);
+                long newRowId=db.insert(Table_Name,null,contentValues);
+        }
 
-         }
+
+        public String viewAll() {
+
+                String data = null;
+                while (res.moveToNext()) {
+                        String key = "Key is:"+ res.getString(0) + "\n";
+                        String Latitude = "Latitude is:"+res.getString(1) + "\n";
+                        String Longitude = "Longitude is:" + res.getString(2) + "\n";
+                        data = key + Latitude + Longitude;
+
+                }
+                return data;
+        }
 
     }
 
